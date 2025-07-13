@@ -1,18 +1,14 @@
 // src/api/axios.js
-
 import axios from "axios";
-
-// Buat instance axios yang terpusat
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL + "/api", // URL API dari .env
+  baseURL: import.meta.env.VITE_API_URL + "/api",
   withCredentials: true,
   headers: {
     Accept: "application/json",
     "Content-Type": "application/json",
   },
 });
-
-// Interceptor: Menambahkan Authorization token dari localStorage sebelum request
+// Interceptor untuk menambahkan Authorization header dari localStorage
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -23,5 +19,4 @@ apiClient.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
-
 export default apiClient;
