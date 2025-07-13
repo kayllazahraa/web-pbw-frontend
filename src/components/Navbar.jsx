@@ -1,9 +1,10 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth'; // ⬅️ Jangan lupa import
 
 const navItems = [
   { id: 'publications', label: 'Daftar Publikasi', path: '/publications' },
-  { id: 'add', label: 'Tambah Publikasi', path: '/publications/add' }, // ✅ path disesuaikan
+  { id: 'add', label: 'Tambah Publikasi', path: '/publications/add' },
 ];
 
 function BpsLogo() {
@@ -16,7 +17,8 @@ function BpsLogo() {
   );
 }
 
-export default function Navbar({ isLoggedIn, setIsLoggedIn }) {
+export default function Navbar() {
+  const { logoutAction, user } = useAuth(); // ✅ pakai dari context
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -24,25 +26,12 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }) {
     const confirmed = confirm('Apakah Anda yakin ingin logout?');
     if (!confirmed) return;
 
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        await fetch('http://localhost:8000/api/logout', {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: 'application/json',
-          },
-        });
-      } catch (err) {
-        console.error('Gagal logout:', err);
-      }
-
-      localStorage.removeItem('token');
+    try {
+      await logoutAction(); // ✅ panggil logout dari context
+      navigate('/login');
+    } catch (err) {
+      console.error('Logout gagal:', err);
     }
-
-    setIsLoggedIn(false);
-    navigate('/login');
   };
 
   return (
@@ -58,7 +47,7 @@ export default function Navbar({ isLoggedIn, setIsLoggedIn }) {
           </div>
 
           {/* Navigasi dan Logout */}
-          {isLoggedIn && (
+          {user && (
             <div className="flex items-center space-x-2">
               {navItems.map((item) => {
                 const isActive = location.pathname === item.path;
