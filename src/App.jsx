@@ -5,11 +5,10 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import LoginPage from './components/LoginPage';
-import RegisterPage from './components/RegisterPage';
 import PublicationListPage from './components/PublicationListPage';
 import AddPublicationPage from './components/AddPublicationPage';
 import EditPublicationPage from './components/EditPublicationPage';
-import ProtectedRoute from './components/ProtectedRoute'; // ✅
+import ProtectedRoute from './components/ProtectedRoute'; 
 
 export default function App() {
   const location = useLocation();
