@@ -1,65 +1,40 @@
 // src/App.jsx
-import React from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import React from "react";
+import {
+    Routes,
+    Route,
+    Navigate,
+} from "react-router-dom";
 
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import LoginPage from './components/LoginPage';
-import PublicationListPage from './components/PublicationListPage';
-import AddPublicationPage from './components/AddPublicationPage';
-import EditPublicationPage from './components/EditPublicationPage';
-import ProtectedRoute from './components/ProtectedRoute'; 
+import ProtectedRoute from "./components/ProtectedRoute";
+import Navbar from "./components/Navbar";
+import PublicationListPage from "./components/PublicationListPage";
+import AddPublicationPage from "./components/AddPublicationPage";
+import EditPublicationPage from "./components/EditPublicationPage";
+import PublicationDetailPage from "./components/PublicationDetailPage";
+import Footer from "./components/Footer";
+import LoginPage from "./components/LoginPage";
+
 
 export default function App() {
-  const location = useLocation();
-  const token = localStorage.getItem("token");
-
-  const hideNavbarRoutes = ['/login', '/register'];
-  const shouldShowNavbar = token && !hideNavbarRoutes.includes(location.pathname);
-
-  return (
-    <div className="bg-gray-100 min-h-screen font-sans">
-      {shouldShowNavbar && <Navbar isLoggedIn={!!token} setIsLoggedIn={() => {}} />}
-
-      <main className="p-4 sm:p-6 lg:p-8">
-        <Routes>
-          {/* ✅ Halaman login dan register tidak perlu login */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-
-          {/* ✅ Semua route ini wajib login */}
-          <Route
-            path="/publications"
-            element={
-              <ProtectedRoute>
-                <PublicationListPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/publications/add"
-            element={
-              <ProtectedRoute>
-                <AddPublicationPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/publications/edit/:id"
-            element={
-              <ProtectedRoute>
-                <EditPublicationPage />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Redirect default */}
-          <Route path="/" element={<Navigate to="/publications" replace />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </main>
-
-      <Footer />
-    </div>
-  );
+    return (
+        <div className="bg-brand-light min-h-screen font-sans text-text-primary">
+            <Navbar />
+            <main className="container mx-auto px-4 py-8">
+                <Routes>
+                    {/* Public Route */}
+                    <Route path="/login" element={<LoginPage />} />
+                    {/* Protected Routes */}
+                    <Route path="/publications" element={<ProtectedRoute><PublicationListPage /></ProtectedRoute>} />
+                    <Route path="/publications/add" element={<ProtectedRoute><AddPublicationPage /></ProtectedRoute>} />
+                    <Route path="/publications/edit/:id" element={<ProtectedRoute><EditPublicationPage /></ProtectedRoute>} />
+                    <Route path="/publications/:id" element={<ProtectedRoute><PublicationDetailPage /></ProtectedRoute>} />
+                    {/* Redirect Routes */}
+                    <Route path="/" element={<Navigate to="/publications" replace />} />
+                    <Route path="*" element={<Navigate to="/publications" replace />} />
+                </Routes>
+            </main>
+            <Footer />
+        </div>
+    );
 }
