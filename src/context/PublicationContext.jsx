@@ -14,10 +14,11 @@ const PublicationProvider = ({ children }) => {
     if (!token) return;
     setLoading(true);
     try {
-      const data = await publicationService.getPublications();
+      const data = await publicationService.getPublications(token);
       setPublications(data);
       setError(null);
     } catch (err) {
+      console.error('Gagal fetch publikasi:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -30,7 +31,7 @@ const PublicationProvider = ({ children }) => {
 
   const addPublication = async (newPub) => {
     try {
-      const added = await publicationService.addPublication(newPub);
+      const added = await publicationService.addPublication(newPub, token);
       setPublications((prev) => [added, ...prev]);
       setError(null);
     } catch (err) {
@@ -41,7 +42,7 @@ const PublicationProvider = ({ children }) => {
 
   const editPublication = async (id, updatedPub) => {
     try {
-      const updated = await publicationService.updatePublication(id, updatedPub);
+      const updated = await publicationService.updatePublication(id, updatedPub, token);
       setPublications((prev) =>
         prev.map((pub) => (pub.id === id ? updated : pub))
       );
@@ -54,11 +55,11 @@ const PublicationProvider = ({ children }) => {
 
   const deletePublication = async (id) => {
     try {
-      await publicationService.deletePublication(id);
-      // 🟡 Optional: pakai getPublications() untuk lebih aman
+      await publicationService.deletePublication(id, token); // ⬅️ token dikirim
       setPublications((prev) => prev.filter((pub) => pub.id !== id));
       setError(null);
     } catch (err) {
+      console.error('Gagal hapus publikasi:', err); // debug
       setError(err.message);
       throw err;
     }

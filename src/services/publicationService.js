@@ -1,11 +1,13 @@
-// src/services/publicationService.js
-
 import apiClient from '../api/axios';
 
 export const publicationService = {
-  async addPublication(newPublication) {
+  async addPublication(newPublication, token) {
     try {
-      const response = await apiClient.post('/publikasi', newPublication);
+      const response = await apiClient.post('/publikasi', newPublication, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data;
     } catch (error) {
       throw new Error(
@@ -15,13 +17,52 @@ export const publicationService = {
     }
   },
 
-  async getPublications() {
+  async getPublications(token) {
     try {
-      const response = await apiClient.get('/publikasi');
+      const response = await apiClient.get('/publikasi', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       return response.data;
     } catch (error) {
       throw new Error(
         'Gagal mengambil data: ' +
+          (error.response?.data?.message || 'Terjadi kesalahan')
+      );
+    }
+  },
+
+  async updatePublication(id, updatedData, token) {
+    try {
+      const response = await apiClient.put(`/publikasi/${id}`, updatedData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        'Gagal mengedit data: ' +
+          (error.response?.data?.message || 'Terjadi kesalahan')
+      );
+    }
+  },
+
+  async deletePublication(id, token) {
+    try {
+      const response = await apiClient.delete(`/publikasi/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.status.toString().startsWith('2')) {
+        throw new Error('Gagal menghapus data');
+      }
+    } catch (error) {
+      throw new Error(
+        'Gagal menghapus data: ' +
           (error.response?.data?.message || 'Terjadi kesalahan')
       );
     }
@@ -48,7 +89,7 @@ export async function uploadImageToCloudinary(file) {
   try {
     const response = await fetch(url, {
       method: 'POST',
-      body: formData
+      body: formData,
     });
 
     if (!response.ok) {
