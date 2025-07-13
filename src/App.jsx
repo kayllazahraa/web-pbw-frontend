@@ -27,7 +27,6 @@ export default function App() {
                     <Route path="/publications" element={<ProtectedRoute><PublicationListPage /></ProtectedRoute>} />
                     <Route path="/publications/add" element={<ProtectedRoute><AddPublicationPage /></ProtectedRoute>} />
                     <Route path="/publications/edit/:id" element={<ProtectedRoute><EditPublicationPage /></ProtectedRoute>} />
-                    <Route path="/publications/:id" element={<ProtectedRoute><PublicationDetailPage /></ProtectedRoute>} />
                     {/* Redirect Routes */}
                     <Route path="/" element={<Navigate to="/publications" replace />} />
                     <Route path="*" element={<Navigate to="/publications" replace />} />
