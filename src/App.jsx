@@ -11,7 +11,6 @@ import Navbar from "./components/Navbar";
 import PublicationListPage from "./components/PublicationListPage";
 import AddPublicationPage from "./components/AddPublicationPage";
 import EditPublicationPage from "./components/EditPublicationPage";
-import PublicationDetailPage from "./components/PublicationDetailPage";
 import Footer from "./components/Footer";
 import LoginPage from "./components/LoginPage";
 
