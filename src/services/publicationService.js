@@ -33,6 +33,22 @@ export const publicationService = {
     }
   },
 
+  async getPublicationById(id, token) {
+    try {
+      const response = await apiClient.get(`/publikasi/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        'Gagal mengambil data publikasi: ' +
+          (error.response?.data?.message || 'Terjadi kesalahan')
+      );
+    }
+  },
+
   async updatePublication(id, updatedData, token) {
     try {
       const response = await apiClient.put(`/publikasi/${id}`, updatedData, {

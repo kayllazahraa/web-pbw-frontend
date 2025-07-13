@@ -1,3 +1,4 @@
+// src/context/PublicationContext.jsx
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { publicationService } from '../services/publicationService';
 import { useAuth } from '../hooks/useAuth';
@@ -29,6 +30,16 @@ const PublicationProvider = ({ children }) => {
     getPublications();
   }, [token]);
 
+  const getPublicationById = async (id) => {
+    if (!token) return null;
+    try {
+      return await publicationService.getPublicationById(id, token);
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
   const addPublication = async (newPub) => {
     try {
       const added = await publicationService.addPublication(newPub, token);
@@ -55,11 +66,11 @@ const PublicationProvider = ({ children }) => {
 
   const deletePublication = async (id) => {
     try {
-      await publicationService.deletePublication(id, token); // ⬅️ token dikirim
+      await publicationService.deletePublication(id, token);
       setPublications((prev) => prev.filter((pub) => pub.id !== id));
       setError(null);
     } catch (err) {
-      console.error('Gagal hapus publikasi:', err); // debug
+      console.error('Gagal hapus publikasi:', err);
       setError(err.message);
       throw err;
     }
@@ -75,6 +86,7 @@ const PublicationProvider = ({ children }) => {
         editPublication,
         deletePublication,
         getPublications,
+        getPublicationById,
       }}
     >
       {children}

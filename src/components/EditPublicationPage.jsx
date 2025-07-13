@@ -1,55 +1,60 @@
-// src/pages/EditPublicationPage.jsx
-
+// src/components/EditPublicationPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { usePublications } from '../context/PublicationContext';
+import { uploadImageToCloudinary } from '../services/publicationService';
 
 export default function EditPublicationPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { publications, fetchPublications } = usePublications();
-
-  const publication = publications.find((pub) => pub.id === parseInt(id));
+  const { getPublicationById, editPublication } = usePublications();
 
   const [title, setTitle] = useState('');
   const [releaseDate, setReleaseDate] = useState('');
+  const [description, setDescription] = useState('');
+  const [currentCoverUrl, setCurrentCoverUrl] = useState('');
   const [coverFile, setCoverFile] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (publication) {
-      setTitle(publication.title);
-      setReleaseDate(publication.releaseDate);
-    }
-  }, [publication]);
+    const fetchPublication = async () => {
+      try {
+        setLoading(true);
+        const pub = await getPublicationById(parseInt(id));
+        if (pub) {
+          setTitle(pub.title);
+          setReleaseDate(pub.releaseDate);
+          setDescription(pub.description || '');
+          setCurrentCoverUrl(pub.coverUrl);
+        }
+      } catch (err) {
+        console.error('Gagal mengambil data publikasi:', err);
+        alert('Gagal mengambil data publikasi.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPublication();
+  }, [id, getPublicationById]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    let coverUrl = publication.coverUrl;
+    let coverUrl = currentCoverUrl;
     if (coverFile) {
-      coverUrl = URL.createObjectURL(coverFile);
+      try {
+        coverUrl = await uploadImageToCloudinary(coverFile);
+      } catch (err) {
+        alert('Gagal upload gambar: ' + err.message);
+        return;
+      }
     }
 
-    const updatedPub = {
-      title,
-      releaseDate,
-      description: publication.description || '',
-      coverUrl,
-    };
+    const updatedPub = { title, releaseDate, description, coverUrl };
 
     try {
-      const res = await fetch(`http://localhost:8000/api/publikasi/${id}`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedPub),
-      });
-
-      if (!res.ok) throw new Error('Gagal update publikasi');
-      await fetchPublications();
+      await editPublication(parseInt(id), updatedPub);
+      alert('Publikasi berhasil diperbarui.');
       navigate('/publications');
     } catch (err) {
       console.error('Update gagal:', err);
@@ -57,8 +62,8 @@ export default function EditPublicationPage() {
     }
   };
 
-  if (!publication) {
-    return <p className="text-center text-red-500 mt-10">Publikasi tidak ditemukan.</p>;
+  if (loading) {
+    return <p className="text-center mt-10">Memuat data...</p>;
   }
 
   return (
@@ -86,15 +91,26 @@ export default function EditPublicationPage() {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Sampul</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            rows={4}
+          ></textarea>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Ganti Sampul</label>
           <input
             type="file"
             accept="image/*"
             onChange={(e) => setCoverFile(e.target.files[0])}
             className="w-full px-3 py-2 border border-gray-300 rounded-md"
           />
+          <p className="text-xs text-gray-500 mt-1">Biarkan kosong jika tidak ingin mengganti sampul.</p>
           <img
-            src={coverFile ? URL.createObjectURL(coverFile) : publication.coverUrl}
+            src={coverFile ? URL.createObjectURL(coverFile) : currentCoverUrl}
             alt="Preview"
             className="h-32 mt-3 rounded shadow"
           />
