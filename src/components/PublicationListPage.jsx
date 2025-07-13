@@ -1,12 +1,37 @@
-// src/pages/PublicationListPage.jsx
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { usePublications } from '../context/PublicationContext';
 
 export default function PublicationListPage() {
-  const { publications } = usePublications();
+  const {
+    publications,
+    getPublications,
+    deletePublication
+  } = usePublications();
+
   const navigate = useNavigate();
+
+  const handleDetail = (id) => {
+    navigate(`/publications/${id}`);
+  };
+
+  const handleEdit = (id) => {
+    navigate(`/publications/edit/${id}`);
+  };
+
+  const handleDelete = async (id) => {
+    const confirmed = confirm('Yakin ingin menghapus publikasi ini?');
+    if (!confirmed) return;
+
+    try {
+      await deletePublication(id);
+      await getPublications();
+      alert('Publikasi berhasil dihapus.');
+    } catch (err) {
+      console.error('Gagal menghapus:', err);
+      alert('Terjadi kesalahan saat menghapus.');
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -48,12 +73,24 @@ export default function PublicationListPage() {
                       }}
                     />
                   </td>
-                  <td className="px-6 py-4 text-center">
+                  <td className="px-6 py-4 text-center space-x-2">
                     <button
-                      onClick={() => navigate(`/publications/edit/${pub.id}`)}
-                      className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-2 rounded font-semibold"
+                      onClick={() => handleDetail(pub.id)}
+                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                    >
+                      Detail
+                    </button>
+                    <button
+                      onClick={() => handleEdit(pub.id)}
+                      className="bg-yellow-400 hover:bg-yellow-500 text-white px-3 py-1 rounded text-sm"
                     >
                       Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(pub.id)}
+                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
+                    >
+                      Hapus
                     </button>
                   </td>
                 </tr>

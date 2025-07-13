@@ -1,5 +1,3 @@
-// src/context/PublicationContext.jsx
-
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { publicationService } from '../services/publicationService';
 import { useAuth } from '../hooks/useAuth';
@@ -12,21 +10,22 @@ const PublicationProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const { token } = useAuth();
 
+  const getPublications = async () => {
+    if (!token) return;
+    setLoading(true);
+    try {
+      const data = await publicationService.getPublications();
+      setPublications(data);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      if (!token) return;
-      setLoading(true);
-      try {
-        const data = await publicationService.getPublications();
-        setPublications(data);
-        setError(null);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+    getPublications();
   }, [token]);
 
   const addPublication = async (newPub) => {
@@ -56,6 +55,7 @@ const PublicationProvider = ({ children }) => {
   const deletePublication = async (id) => {
     try {
       await publicationService.deletePublication(id);
+      // 🟡 Optional: pakai getPublications() untuk lebih aman
       setPublications((prev) => prev.filter((pub) => pub.id !== id));
       setError(null);
     } catch (err) {
@@ -73,6 +73,7 @@ const PublicationProvider = ({ children }) => {
         addPublication,
         editPublication,
         deletePublication,
+        getPublications,
       }}
     >
       {children}
@@ -80,8 +81,6 @@ const PublicationProvider = ({ children }) => {
   );
 };
 
-const usePublications = () => {
-  return useContext(PublicationContext);
-};
+const usePublications = () => useContext(PublicationContext);
 
 export { PublicationContext, PublicationProvider, usePublications };
