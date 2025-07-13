@@ -18,7 +18,7 @@ function BpsLogo() {
 }
 
 export default function Navbar() {
-  const { logoutAction, user } = useAuth(); // ✅ pakai dari context
+  const { logoutAction, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -27,7 +27,7 @@ export default function Navbar() {
     if (!confirmed) return;
 
     try {
-      await logoutAction(); // ✅ panggil logout dari context
+      await logoutAction();
       navigate('/login');
     } catch (err) {
       console.error('Logout gagal:', err);
@@ -55,11 +55,10 @@ export default function Navbar() {
                   <button
                     key={item.id}
                     onClick={() => navigate(item.path)}
-                    className={`px-3 py-2 rounded-md text-sm font-semibold transition-all duration-300 border border-transparent ${
-                      isActive
+                    className={`px-3 py-2 rounded-md text-sm font-semibold transition-all duration-300 border border-transparent ${isActive
                         ? 'bg-slate-200 text-sky-900 shadow-inner'
                         : 'text-sky-100 hover:bg-sky-700 hover:text-white'
-                    }`}
+                      }`}
                   >
                     {item.label}
                   </button>
@@ -68,14 +67,14 @@ export default function Navbar() {
 
               <button
                 onClick={handleLogout}
-                className="px-3 py-2 rounded-md text-sm font-semibold transition-all duration-300 border border-transparent text-sky-100 hover:bg-sky-700 hover:text-white"
+                className="px-3 py-2 rounded-md text-sm font-semibold transition-all duration-300 border border-transparent text-white bg-sky-700 hover:bg-red-600 hover:text-white"
               >
                 Logout
               </button>
             </div>
           )}
-        </div>
       </div>
-    </nav>
+    </div>
+    </nav >
   );
 }
